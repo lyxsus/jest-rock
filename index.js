@@ -105,10 +105,12 @@ class Rock {
 	}
 
 	restore () {
-		this.interceptors
-			.forEach (({object, methodName, original}) =>
-				object [methodName] = original
-			);
+		if (this.interceptors) {
+			this.interceptors
+				.forEach (({object, methodName, original}) =>
+					object [methodName] = original
+				);
+		}
 
 		delete this.interceptors;
 		delete this.records;
@@ -201,7 +203,30 @@ class Rock {
 			mode
 		});
 
-		return (new Rock (options))
-			.setup ();
+		const rock = new Rock (options);
+
+		this.register (rock);
+
+		return rock.setup ();
+	}
+
+	static register (instance) {
+		if (!this.rocks) {
+			this.rocks = [];
+		}
+
+		this.rocks.push (instance);
+	}
+
+	static clearAll () {
+		if (!this.rocks) {
+			return;
+		}
+
+		this.rocks.forEach ((rock) => {
+			rock.restore ()
+		});
+
+		delete this.rocks;
 	}
 }

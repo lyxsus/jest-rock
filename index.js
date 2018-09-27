@@ -120,18 +120,24 @@ class Rock {
 		const records = this.records [index] = [];
 
 		object [methodName] = async function (...args) {
+			const record = {
+				ts0: Date.now ()
+			};
+
+			records.push (record);
+
 			try {
 				const value = await original.apply (object, args);
 
-				records.push ({
-					ts: Date.now (),
+				Object.assign (record, {
+					ts1: Date.now (),
 					value
 				});
 
 				return value;
 			} catch (e) {
-				records.push ({
-					ts: Date.now (),
+				Object.assign (record, {
+					ts1: Date.now (),
 					type: 'error',
 					value: {
 						message: e.message,
@@ -150,20 +156,27 @@ class Rock {
 
 		calls [index] = 0;
 
-		object [methodName] = (...args) => {
+		object [methodName] = () => {
 			const records = this.records [index];
+
 			const i = calls [index]++;
 			const record = records [i];
+			const timeout = (record.ts1 - record.ts0) / 10;
 
 			if (!record) {
 				throw new Error ('Record not found');
-			} else if (record.type === 'error') {
-				return Promise.reject (
-					new Error (record.message)
-				);
-			} else {
-				return Promise.resolve (record.value);
 			}
+
+			return new Promise ((resolve, reject) =>
+				setTimeout (() =>
+					(record.type === 'error')
+						? reject (
+							new Error (record.message)
+						)
+						: resolve (record.value),
+					timeout
+				)
+			)
 		};
 	}
 

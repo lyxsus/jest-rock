@@ -1,6 +1,6 @@
 {
   "name": "jest-rock",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A dummy way to record and replay async functions for jest testing",
   "main": "index.js",
   "author": "lyxsus <lyxsus@gmail.com>",

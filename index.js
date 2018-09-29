@@ -131,7 +131,7 @@ class Rock {
 
 				Object.assign (record, {
 					ts1: Date.now (),
-					value
+					value: JSON.stringify (value)
 				});
 
 				return value;
@@ -173,7 +173,9 @@ class Rock {
 						? reject (
 							new Error (record.message)
 						)
-						: resolve (record.value),
+						: resolve (
+							JSON.parse (record.value)
+						),
 					timeout
 				)
 			)
